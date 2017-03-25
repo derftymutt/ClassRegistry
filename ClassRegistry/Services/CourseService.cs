@@ -11,50 +11,93 @@ namespace ClassRegistry.Services
 {
     public class CourseService : ICourseService
     {
-        public List<Course> Get()
+        //public List<Course> Get()
+        //{
+        //    List<Course> list = null;
+
+        //    string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+
+        //    using (SqlConnection conn = new SqlConnection(connStr))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand())
+        //        {
+        //            cmd.CommandText = "Courses_SelectAll";
+        //            cmd.CommandType = CommandType.StoredProcedure;
+        //            cmd.Connection = conn;
+        //            conn.Open();
+
+        //            using (SqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                if (reader.HasRows)
+        //                {
+
+        //                    while (reader.Read())
+        //                    {
+        //                        if (list == null)
+        //                        {
+        //                            list = new List<Course>();
+        //                        }
+
+        //                        Course c = new Course();
+        //                        int startingIndex = 0;
+
+        //                        c.Id = reader.GetInt64(startingIndex++);
+        //                        c.Name = reader.GetString(startingIndex++);
+        //                        c.Description = reader.GetString(startingIndex++);
+
+        //                        list.Add(c);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return list;
+        //}
+
+        public List<Course> GetCourseList()
         {
-            List<Course> list = null;
+            List<Course> courseList = new List<Course>();
 
-            string connStr = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            QuikStorEntities qse = new QuikStorEntities();
 
-            using (SqlConnection conn = new SqlConnection(connStr))
+            var c = qse.Courses.ToList();
+
+            foreach (var item in c)
             {
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandText = "dbo.Fruits_SelectAll";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Connection = conn;
-                    conn.Open();
+                Course course = new Course();
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.HasRows)
-                        {
+                course.Id = item.id;
+                course.Name = item.name;
+                course.Description = item.description;
 
-                            while (reader.Read())
-                            {
-                                if (list == null)
-                                {
-                                    list = new List<Course>();
-                                }
-
-                                Course c = new Course();
-                                int startingIndex = 0;
-
-                                c.Id = reader.GetInt32(startingIndex++);
-                                c.Name = reader.GetString(startingIndex++);
-                                c.Description = reader.GetString(startingIndex++);
-
-                                list.Add(c);
-                            }
-                        }
-                    }
-                }
+                courseList.Add(course);
             }
-
-            return list;
+             
+            return courseList;
         }
 
+        public List<Student> GetStudentsByCourse(int id)
+        {
+            List<Student> studentList = new List<Student>();
 
+            QuikStorEntities qse = new QuikStorEntities();
+
+            var s = qse.StudentCourses.Where(i => i.course_id == id)
+                .Select(x => x.Student)
+                .Distinct();
+
+            foreach (var item in s)
+            {
+                Student pupil = new Student();
+
+                pupil.first_name = item.first_name;
+                pupil.last_name = item.last_name;
+
+                studentList.Add(pupil);
+            }
+
+            return studentList;
+        }
     }
 }
