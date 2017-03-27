@@ -1,0 +1,138 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/LayoutTheme.cshtml";
+}
+
+@section styles {
+    
+    
+    }
+
+<div ng-controller="registryController as reg">
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span>Choose a course to see registered students</span> 
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="list-group">
+                        <div ng-repeat="course in reg.courseArray">
+                            <a href="#" ng-click="reg.getStudents(course.Id, course.Name)" class="list-group-item">
+                                <span>{{course.Name}}</span>
+                                <span class="pull-right text-muted small">
+                                    <em>{{course.Description}}</em>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- /.list-group -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+        <!-- /.col-lg-4 --> 
+
+        <div class="col-lg-6" ng-show="reg.showStudents">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{reg.selectedCourse}} students
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="student in reg.studentArray">
+                                <tr>
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{student.first_name}}</td>
+                                    <td>{{student.last_name}}</td>
+                                </tr>                    
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+<script src="~/Scripts/services/courses.js"></script>
+
+ <script>
+    (function () {
+        "use strict"
+
+        angular.module("app").controller("registryController", RegistryController);
+
+        RegistryController.$Inject = ["$log", "courseService"];
+
+        function RegistryController($log, courseService) {
+
+            var vm = this;           
+            vm.$log = $log;
+            vm.courseService = courseService;
+
+            //functions
+            vm.getStudents = _getStudents;
+
+            //variables
+            vm.showStudents = false;
+
+            render();
+            function render() {
+                vm.courseService.get().then(_onGetCoursesSuccess, _onGetCoursesError);
+            }
+
+            function _getStudents(courseId, courseName) {
+                vm.courseService.getStudents(courseId).then(_onGetStudentsSuccess, _onGetStudentsError);
+                vm.selectedCourse = courseName;
+            }
+
+
+            //-----ajax responses-----
+
+            //GET courses
+            function _onGetCoursesSuccess(data) {
+                vm.courseArray = data.data.Items;
+            }
+
+            function _onGetCoursesError() {
+                vm.$log.debug("Error getting courses");
+            }
+
+            //GET students
+            function _onGetStudentsSuccess(data) {
+                vm.showStudents = true;
+                vm.studentArray = data.data.Items;
+            }
+
+            function _onGetStudentsError() {
+                vm.$log.debug("Error getting students");
+            }
+        }
+
+    }());
+
+</script>   
+    
+    
+    }
+
+

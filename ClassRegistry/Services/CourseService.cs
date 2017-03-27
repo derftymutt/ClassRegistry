@@ -89,12 +89,12 @@ namespace ClassRegistry.Services
 
             foreach (var item in s)
             {
-                Student pupil = new Student();
+                Student student = new Student();
 
-                pupil.first_name = item.first_name;
-                pupil.last_name = item.last_name;
+                student.first_name = item.first_name;
+                student.last_name = item.last_name;
 
-                studentList.Add(pupil);
+                studentList.Add(student);
             }
 
             return studentList;
